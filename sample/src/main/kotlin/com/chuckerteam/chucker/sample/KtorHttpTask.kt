@@ -14,7 +14,6 @@ import io.ktor.client.request.put
 import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.Parameters
@@ -212,7 +211,7 @@ class KtorHttpTask(
 
     private suspend fun HttpClient.readText(block: suspend HttpClient.() -> HttpResponse) {
         runCatching {
-            block().bodyAsText()
+            block().body<String>()
         }.onFailure { throwable ->
             throwable.printStackTrace()
         }
