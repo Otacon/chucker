@@ -56,6 +56,7 @@ tasks.withType<KotlinCompile>().configureEach {
 
 dependencies {
     api(libs.okhttp)
+    api(libs.ktor.client.core)
     implementation(libs.jetbrains.kotlin.stdlib)
 }
 

@@ -92,6 +92,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
 
     implementation(libs.logging.interceptor)
+    implementation(libs.ktor.client.cio)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
 

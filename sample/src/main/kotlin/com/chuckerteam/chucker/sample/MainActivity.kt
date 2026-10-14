@@ -42,6 +42,10 @@ class MainActivity : ComponentActivity() {
         )
     }
 
+    private val ktorHttpTask by lazy {
+        KtorHttpTask(applicationContext, lifecycleScope)
+    }
+
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,6 +66,9 @@ class MainActivity : ComponentActivity() {
                         for (task in httpTasks) {
                             task.run()
                         }
+                    },
+                    onDoKtorHttp = {
+                        ktorHttpTask.run()
                     },
                     onDoGraphQL = {
                         GraphQlTask(client).run()

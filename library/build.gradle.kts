@@ -102,6 +102,7 @@ dependencies {
 
     api(libs.okhttp)
     api(libs.okhttp3.okhttp)
+    api(libs.ktor.client.core)
     testImplementation(libs.mockwebserver)
     testRuntimeOnly(libs.junit.engine)
     testRuntimeOnly(libs.junit.platform.launcher)
