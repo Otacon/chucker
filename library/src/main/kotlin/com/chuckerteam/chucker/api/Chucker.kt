@@ -11,7 +11,7 @@ import androidx.core.content.getSystemService
 import com.chuckerteam.chucker.R
 import com.chuckerteam.chucker.internal.support.Logger
 import com.chuckerteam.chucker.internal.support.NotificationHelper
-import com.chuckerteam.chucker.internal.ui.MainActivity
+import com.chuckerteam.chucker.internal.ui.MainActivity2
 
 /**
  * Chucker methods and utilities to interact with the library.
@@ -38,7 +38,7 @@ public object Chucker {
      */
     @JvmStatic
     public fun getLaunchIntent(context: Context): Intent =
-        Intent(context, MainActivity::class.java)
+        Intent(context, MainActivity2::class.java)
             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
     /**
