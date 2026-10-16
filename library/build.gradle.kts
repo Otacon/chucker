@@ -10,7 +10,9 @@ plugins {
 kotlin {
     compilerOptions {
         freeCompilerArgs.addAll(
-            "-module-name", "com.github.ChuckerTeam.Chucker.library", "-Xexplicit-api=strict",
+            "-module-name",
+            "com.github.ChuckerTeam.Chucker.library",
+            "-Xexplicit-api=strict",
         )
     }
     androidTarget {
@@ -91,7 +93,6 @@ dependencies {
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
     add("kspAndroid", libs.androidx.room.compiler)
@@ -111,10 +112,10 @@ dependencies {
     add("androidUnitTestImplementation", libs.junit.jupiter.params)
     add("androidUnitTestImplementation", libs.mockk)
     add("androidUnitTestImplementation", libs.androidx.core)
-    add("androidUnitTestImplementation", libs.androidx.core.testing)
     add("androidUnitTestImplementation", libs.truth)
     add("androidUnitTestImplementation", libs.robolectric)
     add("androidUnitTestImplementation", libs.kotlinx.coroutines.test)
+    add("androidUnitTestImplementation", libs.kotlinx.coroutines.turbine)
     add("androidInstrumentedTestImplementation", libs.junit4)
     add("androidInstrumentedTestImplementation", libs.androidx.test.runner)
     add("androidInstrumentedTestImplementation", libs.androidx.test.rules)

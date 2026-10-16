@@ -1,8 +1,8 @@
 package com.chuckerteam.chucker.internal.data.repository
 
-import androidx.lifecycle.LiveData
 import com.chuckerteam.chucker.internal.data.entity.HttpTransaction
 import com.chuckerteam.chucker.internal.data.entity.HttpTransactionTuple
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Repository Interface representing all the operations that are needed to let Chucker work
@@ -19,14 +19,14 @@ internal interface HttpTransactionRepository {
 
     suspend fun deleteAllTransactions()
 
-    fun getSortedTransactionTuples(): LiveData<List<HttpTransactionTuple>>
+    fun getSortedTransactionTuples(): Flow<List<HttpTransactionTuple>>
 
     fun getFilteredTransactionTuples(
         code: String,
         path: String,
-    ): LiveData<List<HttpTransactionTuple>>
+    ): Flow<List<HttpTransactionTuple>>
 
-    fun getTransaction(transactionId: Long): LiveData<HttpTransaction?>
+    fun getTransaction(transactionId: Long): Flow<HttpTransaction?>
 
     suspend fun getAllTransactions(): List<HttpTransaction>
 

@@ -11,8 +11,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
-import androidx.lifecycle.Observer
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager.widget.ViewPager
 import com.chuckerteam.chucker.R
 import com.chuckerteam.chucker.databinding.ChuckerActivityTransactionBinding
@@ -26,6 +27,7 @@ import com.chuckerteam.chucker.internal.support.shareAsFile
 import com.chuckerteam.chucker.internal.support.shareAsUtf8Text
 import com.chuckerteam.chucker.internal.ui.BaseChuckerActivity
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -50,10 +52,11 @@ internal class TransactionActivity : BaseChuckerActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        viewModel.transactionTitle.observe(
-            this,
-            Observer { transactionBinding.toolbarTitle.text = it },
-        )
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.transactionTitle.collect { transactionBinding.toolbarTitle.text = it }
+            }
+        }
     }
 
     private fun applyInset() {
@@ -90,18 +93,19 @@ internal class TransactionActivity : BaseChuckerActivity() {
             viewModel.switchUrlEncoding()
             return@setOnMenuItemClickListener true
         }
-        viewModel.encodeUrl.observe(
-            this,
-            Observer { encode ->
-                val icon =
-                    if (encode) {
-                        R.drawable.chucker_ic_encoded_url_white
-                    } else {
-                        R.drawable.chucker_ic_decoded_url_white
-                    }
-                encodeUrlMenuItem.setIcon(icon)
-            },
-        )
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.encodeUrl.collect { encode ->
+                    val icon =
+                        if (encode) {
+                            R.drawable.chucker_ic_encoded_url_white
+                        } else {
+                            R.drawable.chucker_ic_decoded_url_white
+                        }
+                    encodeUrlMenuItem.setIcon(icon)
+                }
+            }
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem) =

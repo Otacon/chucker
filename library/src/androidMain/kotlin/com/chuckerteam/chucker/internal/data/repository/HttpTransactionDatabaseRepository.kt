@@ -1,10 +1,10 @@
 package com.chuckerteam.chucker.internal.data.repository
 
-import androidx.lifecycle.LiveData
 import com.chuckerteam.chucker.internal.data.entity.HttpTransaction
 import com.chuckerteam.chucker.internal.data.entity.HttpTransactionTuple
 import com.chuckerteam.chucker.internal.data.room.ChuckerDatabase
-import com.chuckerteam.chucker.internal.support.distinctUntilChanged
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 internal class HttpTransactionDatabaseRepository(
     private val database: ChuckerDatabase,
@@ -14,7 +14,7 @@ internal class HttpTransactionDatabaseRepository(
     override fun getFilteredTransactionTuples(
         code: String,
         path: String,
-    ): LiveData<List<HttpTransactionTuple>> {
+    ): Flow<List<HttpTransactionTuple>> {
         val pathQuery = if (path.isNotEmpty()) "%$path%" else "%"
         return transactionDao.getFilteredTuples(
             "$code%",
@@ -27,12 +27,12 @@ internal class HttpTransactionDatabaseRepository(
         )
     }
 
-    override fun getTransaction(transactionId: Long): LiveData<HttpTransaction?> =
+    override fun getTransaction(transactionId: Long): Flow<HttpTransaction?> =
         transactionDao
             .getById(transactionId)
             .distinctUntilChanged { old, new -> old?.hasTheSameContent(new) != false }
 
-    override fun getSortedTransactionTuples(): LiveData<List<HttpTransactionTuple>> = transactionDao.getSortedTuples()
+    override fun getSortedTransactionTuples(): Flow<List<HttpTransactionTuple>> = transactionDao.getSortedTuples()
 
     override suspend fun deleteAllTransactions() {
         transactionDao.deleteAll()
