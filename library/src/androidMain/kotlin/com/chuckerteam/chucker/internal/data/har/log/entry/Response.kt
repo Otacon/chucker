@@ -3,22 +3,24 @@ package com.chuckerteam.chucker.internal.data.har.log.entry
 import com.chuckerteam.chucker.internal.data.entity.HttpTransaction
 import com.chuckerteam.chucker.internal.data.har.log.entry.response.Content
 import com.chuckerteam.chucker.internal.data.har.log.entry.response.Content.Companion.EMPTY
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 // https://github.com/ahmadnassri/har-spec/blob/master/versions/1.2.md#response
 // http://www.softwareishard.com/blog/har-12-spec/#response
+@Serializable
 internal data class Response(
-    @SerializedName("status") val status: Int,
-    @SerializedName("statusText") val statusText: String,
-    @SerializedName("httpVersion") val httpVersion: String,
-    @SerializedName("cookies") val cookies: List<Any> = emptyList(),
-    @SerializedName("headers") val headers: List<Header>,
-    @SerializedName("content") val content: Content? = null,
-    @SerializedName("redirectURL") val redirectUrl: String = "",
-    @SerializedName("headersSize") val headersSize: Long,
-    @SerializedName("bodySize") val bodySize: Long,
-    @SerializedName("totalSize") val totalSize: Long,
-    @SerializedName("comment") val comment: String? = null,
+    @SerialName("status") val status: Int,
+    @SerialName("statusText") val statusText: String,
+    @SerialName("httpVersion") val httpVersion: String,
+    @SerialName("cookies") val cookies: List<kotlinx.serialization.json.JsonElement> = emptyList(),
+    @SerialName("headers") val headers: List<Header>,
+    @SerialName("content") val content: Content? = null,
+    @SerialName("redirectURL") val redirectUrl: String = "",
+    @SerialName("headersSize") val headersSize: Long,
+    @SerialName("bodySize") val bodySize: Long,
+    @SerialName("totalSize") val totalSize: Long,
+    @SerialName("comment") val comment: String? = null,
 ) {
     constructor(transaction: HttpTransaction) : this(
         status = transaction.responseCode ?: 0,

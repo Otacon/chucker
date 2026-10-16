@@ -16,7 +16,6 @@ import com.chuckerteam.chucker.internal.support.FormattedUrl
 import com.chuckerteam.chucker.internal.support.HttpHeaderSerializer
 import com.chuckerteam.chucker.internal.support.JsonConverter
 import com.chuckerteam.chucker.internal.support.SpanTextUtil
-import com.google.gson.reflect.TypeToken
 import okhttp3.Headers
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -175,16 +174,10 @@ internal class HttpTransaction(
     }
 
     fun getParsedRequestHeaders(): List<HttpHeader>? =
-        JsonConverter.instance.fromJson<List<HttpHeader>>(
-            requestHeaders,
-            TypeToken.getParameterized(List::class.java, HttpHeader::class.java).type,
-        )
+        JsonConverter.fromJson<List<HttpHeader>>(requestHeaders)
 
     fun getParsedResponseHeaders(): List<HttpHeader>? =
-        JsonConverter.instance.fromJson<List<HttpHeader>>(
-            responseHeaders,
-            TypeToken.getParameterized(List::class.java, HttpHeader::class.java).type,
-        )
+        JsonConverter.fromJson<List<HttpHeader>>(responseHeaders)
 
     fun getRequestHeadersString(withMarkup: Boolean): String =
         FormatUtils.formatHeaders(

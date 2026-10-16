@@ -6,24 +6,26 @@ import com.chuckerteam.chucker.internal.data.har.log.entry.Cache
 import com.chuckerteam.chucker.internal.data.har.log.entry.Request
 import com.chuckerteam.chucker.internal.data.har.log.entry.Response
 import com.chuckerteam.chucker.internal.data.har.log.entry.Timings
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 // https://github.com/ahmadnassri/har-spec/blob/master/versions/1.2.md#entries
 // http://www.softwareishard.com/blog/har-12-spec/#entries
+@Serializable
 internal data class Entry(
-    @SerializedName("pageref") val pageref: String? = null,
-    @SerializedName("startedDateTime") val startedDateTime: String,
-    @SerializedName("time") var time: Long,
-    @SerializedName("request") val request: Request,
-    @SerializedName("response") val response: Response,
-    @SerializedName("cache") val cache: Cache,
-    @SerializedName("timings") val timings: Timings,
-    @SerializedName("serverIPAddress") val serverIPAddress: String? = null,
-    @SerializedName("connection") val connection: String? = null,
-    @SerializedName("comment") val comment: String? = null,
+    @SerialName("pageref") val pageref: String? = null,
+    @SerialName("startedDateTime") val startedDateTime: String,
+    @SerialName("time") var time: Long,
+    @SerialName("request") val request: Request,
+    @SerialName("response") val response: Response,
+    @SerialName("cache") val cache: Cache,
+    @SerialName("timings") val timings: Timings,
+    @SerialName("serverIPAddress") val serverIPAddress: String? = null,
+    @SerialName("connection") val connection: String? = null,
+    @SerialName("comment") val comment: String? = null,
 ) {
     constructor(transaction: HttpTransaction) : this(
         startedDateTime = transaction.requestDate?.harFormatted().orEmpty(),

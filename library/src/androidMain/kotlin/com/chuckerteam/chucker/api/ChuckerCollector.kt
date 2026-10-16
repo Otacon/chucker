@@ -8,6 +8,7 @@ import com.chuckerteam.chucker.internal.data.har.log.Creator
 import com.chuckerteam.chucker.internal.data.repository.RepositoryProvider
 import com.chuckerteam.chucker.internal.support.HarUtils
 import com.chuckerteam.chucker.internal.support.JsonConverter
+import kotlinx.serialization.encodeToString
 import com.chuckerteam.chucker.internal.support.NotificationHelper
 import com.chuckerteam.chucker.internal.support.TransactionDetailsHarSharable
 import com.chuckerteam.chucker.internal.support.TransactionListDetailsSharable
@@ -109,7 +110,7 @@ public class ChuckerCollector
                     ExportFormat.HAR -> {
                         TransactionDetailsHarSharable(
                             JsonConverter.nonNullSerializerInstance
-                                .toJson(
+                                .encodeToString(
                                     HarUtils.fromHttpTransactions(
                                         transactions,
                                         Creator(

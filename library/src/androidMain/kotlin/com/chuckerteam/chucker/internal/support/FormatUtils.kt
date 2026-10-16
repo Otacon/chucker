@@ -1,8 +1,8 @@
 package com.chuckerteam.chucker.internal.support
 
 import com.chuckerteam.chucker.internal.data.entity.HttpHeader
-import com.google.gson.JsonParseException
-import com.google.gson.JsonParser
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.Json
 import org.w3c.dom.Document
 import org.xml.sax.InputSource
 import org.xml.sax.SAXParseException
@@ -27,6 +27,10 @@ import kotlin.math.pow
 internal object FormatUtils {
     private const val SI_MULTIPLE = 1000
     private const val BASE_TWO_MULTIPLE = 1024
+    private val prettyJson = Json {
+        prettyPrint = true
+        prettyPrintIndent = "  "
+    }
 
     fun formatHeaders(
         httpHeaders: List<HttpHeader>?,
@@ -58,9 +62,11 @@ internal object FormatUtils {
 
     fun formatJson(json: String): String =
         try {
-            val je = JsonParser.parseString(json)
-            JsonConverter.instance.toJson(je)
-        } catch (e: JsonParseException) {
+            prettyJson.encodeToString(
+                kotlinx.serialization.json.JsonElement.serializer(),
+                prettyJson.parseToJsonElement(json),
+            )
+        } catch (e: SerializationException) {
             json
         }
 

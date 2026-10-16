@@ -10,9 +10,9 @@ import com.chuckerteam.chucker.util.readByteStringBody
 import com.chuckerteam.chucker.util.toServerRequest
 import com.google.common.collect.Range
 import com.google.common.truth.Truth.assertThat
-import com.google.gson.Gson
-import com.google.gson.JsonParseException
-import com.google.gson.stream.JsonReader
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Request
 import okhttp3.RequestBody
@@ -485,11 +485,8 @@ internal class ChuckerInterceptorTest {
         val client = factory.create(chuckerInterceptor)
         val responseBody = client.newCall(request).execute().body!!
 
-        val jsonAdapter = Gson().getAdapter(Expected::class.java)
-        val jsonReader = JsonReader(responseBody.charStream())
-
-        assertThrows<JsonParseException> {
-            jsonAdapter.read(jsonReader)
+        assertThrows<SerializationException> {
+            Json.decodeFromString<Expected>(responseBody.string())
         }
         responseBody.close()
 
@@ -500,6 +497,7 @@ internal class ChuckerInterceptorTest {
         chuckerInterceptor.expectNoTransactions()
     }
 
+    @Serializable
     private data class Expected(
         val string: String,
         val boolean: Boolean,
