@@ -7,3 +7,10 @@ public final class com/chuckerteam/chucker/api/ChuckerDesktopScreenKt {
 	public static final fun ChuckerDesktopScreen (Landroidx/compose/runtime/Composer;I)V
 }
 
+public final class com/chuckerteam/chucker/api/ChuckerInterceptor : okhttp3/Interceptor {
+	public static final field $stable I
+	public static final field MAX_CAPTURE_BYTES J
+	public fun <init> ()V
+	public fun intercept (Lokhttp3/Interceptor$Chain;)Lokhttp3/Response;
+}
+

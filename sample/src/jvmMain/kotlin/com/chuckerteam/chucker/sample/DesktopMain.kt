@@ -9,28 +9,35 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.chuckerteam.chucker.api.ChuckerDesktopScreen
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.HttpUrl.Companion.toHttpUrl
 import okio.Buffer
 import okio.BufferedSink
 import java.util.Base64
 
 fun main() =
     application {
-        val client = remember { OkHttpClient() }
+        val client =
+            remember {
+                OkHttpClient
+                    .Builder()
+                    .addInterceptor(ChuckerInterceptor())
+                    .build()
+        }
         var isChuckerWindowOpen by remember { mutableStateOf(false) }
 
         Window(

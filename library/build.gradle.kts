@@ -52,6 +52,9 @@ kotlin {
             implementation(compose.foundation)
             implementation(libs.androidx.sqlite.bundled)
         }
+        jvmTest.dependencies {
+            implementation(libs.mockwebserver)
+        }
 
         val androidJvmTest = create("androidJvmTest") {
             dependsOn(commonTest.get())
