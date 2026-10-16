@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.chuckerteam.chucker.internal.data.repository.RepositoryProvider
+import com.chuckerteam.chucker.internal.data.repository.initialize
 
 internal abstract class BaseChuckerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

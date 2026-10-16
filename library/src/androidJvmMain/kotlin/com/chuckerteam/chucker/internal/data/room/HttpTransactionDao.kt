@@ -50,7 +50,7 @@ internal interface HttpTransactionDao {
     suspend fun getAll(): List<HttpTransaction>
 
     @Query("SELECT * FROM transactions WHERE requestDate >= :timestamp")
-    fun getTransactionsInTimeRange(timestamp: Long): List<HttpTransaction>
+    suspend fun getTransactionsInTimeRange(timestamp: Long): List<HttpTransaction>
 
     @Query("DELETE FROM transactions WHERE id IN (:selectedTransactions)")
     suspend fun deleteSelected(selectedTransactions: List<Long>)

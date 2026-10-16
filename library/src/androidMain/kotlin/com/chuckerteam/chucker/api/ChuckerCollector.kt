@@ -6,6 +6,7 @@ import com.chuckerteam.chucker.R
 import com.chuckerteam.chucker.internal.data.entity.HttpTransaction
 import com.chuckerteam.chucker.internal.data.har.log.Creator
 import com.chuckerteam.chucker.internal.data.repository.RepositoryProvider
+import com.chuckerteam.chucker.internal.data.repository.initialize
 import com.chuckerteam.chucker.internal.support.HarUtils
 import com.chuckerteam.chucker.internal.support.JsonConverter
 import kotlinx.serialization.encodeToString
@@ -16,6 +17,7 @@ import com.chuckerteam.chucker.internal.support.writeToFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 /**
@@ -97,7 +99,9 @@ public class ChuckerCollector
             exportFormat: ExportFormat = ExportFormat.LOG,
         ): Uri? {
             val transactions =
-                RepositoryProvider.transaction().getTransactionsInTimeRange(startTimestamp)
+                runBlocking(Dispatchers.IO) {
+                    RepositoryProvider.transaction().getTransactionsInTimeRange(startTimestamp)
+                }
             if (transactions.isEmpty()) {
                 return null
             }

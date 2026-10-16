@@ -51,7 +51,7 @@ internal class HttpTransactionDatabaseRepository(
 
     override suspend fun getAllTransactions(): List<HttpTransaction> = transactionDao.getAll()
 
-    override fun getTransactionsInTimeRange(minTimestamp: Long?): List<HttpTransaction> {
+    override suspend fun getTransactionsInTimeRange(minTimestamp: Long?): List<HttpTransaction> {
         val timestamp = minTimestamp ?: 0L
         return transactionDao.getTransactionsInTimeRange(timestamp)
     }
