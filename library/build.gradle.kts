@@ -36,6 +36,9 @@ kotlin {
         }
         androidMain.get().dependsOn(androidJvmMain)
         jvmMain.get().dependsOn(androidJvmMain)
+        jvmMain.dependencies {
+            implementation(libs.androidx.sqlite.bundled)
+        }
 
         val androidJvmTest = create("androidJvmTest") {
             dependsOn(commonTest.get())

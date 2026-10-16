@@ -19,6 +19,7 @@ loggingInterceptor = "5.4.0"
 materialComponents = "1.14.0"
 fragment = "1.9.1"
 room = "2.7.2"
+sqlite = "2.5.1"
 lifecycle = "2.10.0"
 paletteKtx = "1.0.0"
 
@@ -73,6 +74,7 @@ androidx-palette-ktx = { group = "androidx.palette", name = "palette-ktx", versi
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+androidx-sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", version.ref = "sqlite" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 dec = { module = "org.brotli:dec", version.ref = "dec" }
 jetbrains-kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlinStdlib" }
