@@ -41,6 +41,7 @@ apollo = "5.2.0"
 
 # Compose
 composeBom = "2026.06.01"
+composeMultiplatform = "1.12.2"
 lifecycleViewmodelCompose = "2.11.0"
 
 # Testing
@@ -142,3 +143,4 @@ kotlinx-binary-compatibility-validator = { id = "org.jetbrains.kotlinx.binary-co
 wire = { id = "com.squareup.wire", version.ref = "wire" }
 nexus-publish = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "nexusPublishPlugin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }

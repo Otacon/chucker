@@ -3,3 +3,7 @@ public abstract interface class com/chuckerteam/chucker/api/BodyDecoder {
 	public abstract fun decodeResponse (Lokhttp3/Response;Lokio/ByteString;)Ljava/lang/String;
 }
 
+public final class com/chuckerteam/chucker/api/ChuckerDesktopScreenKt {
+	public static final fun ChuckerDesktopScreen (Landroidx/compose/runtime/Composer;I)V
+}
+

@@ -6,6 +6,8 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.compose.multiplatform)
 }
 
 kotlin {
@@ -36,7 +38,18 @@ kotlin {
         }
         androidMain.get().dependsOn(androidJvmMain)
         jvmMain.get().dependsOn(androidJvmMain)
+        androidMain.dependencies {
+            compileOnly(compose.runtime)
+        }
+        androidUnitTest.dependencies {
+            implementation(compose.runtime)
+        }
+        androidInstrumentedTest.dependencies {
+            implementation(compose.runtime)
+        }
         jvmMain.dependencies {
+            api(compose.runtime)
+            implementation(compose.foundation)
             implementation(libs.androidx.sqlite.bundled)
         }
 

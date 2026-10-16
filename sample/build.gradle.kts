@@ -4,13 +4,31 @@ plugins {
     alias(libs.plugins.wire)
     alias(libs.plugins.apollo)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.compose.multiplatform)
 }
 
 kotlin {
     androidTarget {
         compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
     }
+    jvm {
+        compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+    }
     jvmToolchain(21)
+
+    sourceSets {
+        jvmMain.dependencies {
+            implementation(project(":library"))
+            implementation(libs.okhttp)
+            implementation(libs.apollo.runtime)
+            implementation(compose.desktop.currentOs)
+            implementation(compose.material3)
+        }
+    }
+}
+
+compose.desktop.application {
+    mainClass = "com.chuckerteam.chucker.sample.DesktopMainKt"
 }
 
 wire {
