@@ -2,11 +2,6 @@
 
 package com.chuckerteam.chucker.internal.data.entity
 
-import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.text.SpannableStringBuilder
-import android.text.style.ForegroundColorSpan
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
@@ -15,7 +10,6 @@ import com.chuckerteam.chucker.internal.support.FormatUtils
 import com.chuckerteam.chucker.internal.support.FormattedUrl
 import com.chuckerteam.chucker.internal.support.HttpHeaderSerializer
 import com.chuckerteam.chucker.internal.support.JsonConverter
-import com.chuckerteam.chucker.internal.support.SpanTextUtil
 import okhttp3.Headers
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -151,13 +145,6 @@ internal class HttpTransaction(
     val isSsl: Boolean
         get() = scheme.equals("https", ignoreCase = true)
 
-    val responseImageBitmap: Bitmap?
-        get() {
-            return responseImageData?.let {
-                BitmapFactory.decodeByteArray(it, 0, it.size)
-            }
-        }
-
     fun setRequestHeaders(headers: Headers) {
         setRequestHeaders(toHttpHeaderList(headers))
     }
@@ -207,55 +194,7 @@ internal class HttpTransaction(
         return httpHeaders
     }
 
-    private fun formatBody(
-        body: String,
-        contentType: String?,
-    ): String =
-        when {
-            contentType.isNullOrBlank() -> body
-            contentType.contains("json", ignoreCase = true) -> FormatUtils.formatJson(body)
-            contentType.contains("xml", ignoreCase = true) -> FormatUtils.formatXml(body)
-            contentType.contains("x-www-form-urlencoded", ignoreCase = true) ->
-                FormatUtils.formatUrlEncodedForm(body)
-            else -> body
-        }
-
-    /**
-     * This method creates [android.text.SpannableString] from body
-     * and add [ForegroundColorSpan] to text with different colors for better contrast between
-     * keys and values and etc in the body.
-     *
-     * This method just works with json content-type yet, and calls [formatBody]
-     * for other content-type until parser function will be developed for other content-types.
-     */
-    private fun spanBody(
-        body: CharSequence,
-        contentType: String?,
-        context: Context?,
-    ): CharSequence =
-        when {
-            // TODO Implement Other Content Types
-            contentType.isNullOrBlank() -> body
-            contentType.contains("json", ignoreCase = true) && context != null -> {
-                SpanTextUtil(context).spanJson(body)
-            }
-            else -> formatBody(body.toString(), contentType)
-        }
-
     private fun formatBytes(bytes: Long): String = FormatUtils.formatByteCount(bytes, true)
-
-    fun getFormattedRequestBody(): String = requestBody?.let { formatBody(it, requestContentType) } ?: ""
-
-    fun getSpannedRequestBody(context: Context?): CharSequence =
-        requestBody?.let { spanBody(it, requestContentType, context) }
-            ?: SpannableStringBuilder.valueOf("")
-
-    fun getFormattedResponseBody(): String = responseBody?.let { formatBody(it, responseContentType) } ?: ""
-
-    fun getSpannedResponseBody(context: Context?): CharSequence =
-        responseBody?.let {
-            spanBody(it, responseContentType, context)
-        } ?: SpannableStringBuilder.valueOf("")
 
     fun populateUrl(httpUrl: HttpUrl): HttpTransaction {
         val formattedUrl = FormattedUrl.fromHttpUrl(httpUrl, encoded = false)

@@ -7,6 +7,7 @@ import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Bundle
 import android.text.SpannableStringBuilder
@@ -36,6 +37,10 @@ import com.chuckerteam.chucker.internal.data.entity.HttpTransaction
 import com.chuckerteam.chucker.internal.support.FileSaver
 import com.chuckerteam.chucker.internal.support.Logger
 import com.chuckerteam.chucker.internal.support.calculateLuminance
+import com.chuckerteam.chucker.internal.support.getFormattedRequestBody
+import com.chuckerteam.chucker.internal.support.getFormattedResponseBody
+import com.chuckerteam.chucker.internal.support.getSpannedRequestBody
+import com.chuckerteam.chucker.internal.support.getSpannedResponseBody
 import com.chuckerteam.chucker.internal.support.spannableChunked
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -487,7 +492,7 @@ internal class TransactionPayloadFragment :
             }
 
             // The body could either be an image, plain text, decoded binary or not decoded binary.
-            val responseBitmap = transaction.responseImageBitmap
+            val responseBitmap = transaction.responseImageData?.let { BitmapFactory.decodeByteArray(it, 0, it.size) }
 
             if (type == PayloadType.RESPONSE && responseBitmap != null) {
                 val bitmapLuminance = responseBitmap.calculateLuminance()
