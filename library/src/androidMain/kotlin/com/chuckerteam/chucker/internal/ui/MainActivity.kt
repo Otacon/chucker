@@ -23,7 +23,9 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.chuckerteam.chucker.R
 import com.chuckerteam.chucker.api.Chucker
@@ -44,6 +46,7 @@ import com.chuckerteam.chucker.internal.ui.transaction.TransactionActivity
 import com.chuckerteam.chucker.internal.ui.transaction.TransactionAdapter
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okio.Source
@@ -92,7 +95,7 @@ internal class MainActivity :
             TransactionAdapter(
                 context = this,
                 onTransactionClick = { transactionId ->
-                    if (viewModel.isItemSelected.value == true) {
+                    if (viewModel.isItemSelected.value) {
                         viewModel.toggleSelection(transactionId)
                     } else {
                         TransactionActivity.start(this, transactionId)
@@ -122,19 +125,22 @@ internal class MainActivity :
             }
         }
 
-        viewModel.transactions.observe(
-            this,
-        ) { transactionTuples ->
-            transactionsAdapter.submitList(transactionTuples)
-            mainBinding.tutorialGroup.isVisible = transactionTuples.isEmpty()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.transactions.collect { transactionTuples ->
+                        transactionsAdapter.submitList(transactionTuples)
+                        mainBinding.tutorialGroup.isVisible = transactionTuples.isEmpty()
+                    }
+                }
+                launch {
+                    viewModel.isItemSelected.collect(transactionsAdapter::setSelectionMode)
+                }
+            }
         }
 
         if (Chucker.showNotifications && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             handleNotificationsPermission()
-        }
-
-        viewModel.isItemSelected.observe(this) { isSelected ->
-            transactionsAdapter.setSelectionMode(isSelected)
         }
     }
 
@@ -215,7 +221,7 @@ internal class MainActivity :
 
             R.id.share_text -> {
                 val stringId =
-                    if (viewModel.isItemSelected.value == true) {
+                    if (viewModel.isItemSelected.value) {
                         R.string.chucker_export_text_selected_http_confirmation
                     } else {
                         R.string.chucker_export_text_http_confirmation
@@ -234,7 +240,7 @@ internal class MainActivity :
 
             R.id.share_har -> {
                 val stringId =
-                    if (viewModel.isItemSelected.value == true) {
+                    if (viewModel.isItemSelected.value) {
                         R.string.chucker_export_har_selected_http_confirmation
                     } else {
                         R.string.chucker_export_har_http_confirmation
@@ -328,7 +334,7 @@ internal class MainActivity :
             title = getString(R.string.chucker_clear),
             message =
                 getString(
-                    if (viewModel.isItemSelected.value == true) {
+                    if (viewModel.isItemSelected.value) {
                         R.string.chucker_clear_selected_http_confirmation
                     } else {
                         R.string.chucker_clear_http_confirmation

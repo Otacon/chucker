@@ -26,8 +26,9 @@ import androidx.core.text.bold
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.withResumed
 import com.chuckerteam.chucker.R
 import com.chuckerteam.chucker.databinding.ChuckerFragmentTransactionPayloadBinding
@@ -35,10 +36,10 @@ import com.chuckerteam.chucker.internal.data.entity.HttpTransaction
 import com.chuckerteam.chucker.internal.support.FileSaver
 import com.chuckerteam.chucker.internal.support.Logger
 import com.chuckerteam.chucker.internal.support.calculateLuminance
-import com.chuckerteam.chucker.internal.support.combineLatest
 import com.chuckerteam.chucker.internal.support.spannableChunked
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okio.Source
@@ -128,27 +129,30 @@ internal class TransactionPayloadFragment :
             adapter = payloadAdapter
         }
 
-        viewModel.transaction.combineLatest(viewModel.formatRequestBody).observe(
-            viewLifecycleOwner,
-            Observer { (transaction, formatRequestBody) ->
-                if (transaction == null) return@Observer
-                lifecycleScope.launch {
-                    payloadBinding.loadingProgress.visibility = View.VISIBLE
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.transaction
+                    .combine(viewModel.formatRequestBody) { transaction, format -> transaction to format }
+                    .collect { (transaction, formatRequestBody) ->
+                        if (transaction == null) return@collect
+                        lifecycleScope.launch {
+                            payloadBinding.loadingProgress.visibility = View.VISIBLE
 
-                    val result = processPayload(payloadType, transaction, formatRequestBody)
-                    if (result.isEmpty()) {
-                        showEmptyState()
-                    } else {
-                        payloadAdapter.setItems(result)
-                        showPayloadState()
+                            val result = processPayload(payloadType, transaction, formatRequestBody)
+                            if (result.isEmpty()) {
+                                showEmptyState()
+                            } else {
+                                payloadAdapter.setItems(result)
+                                showPayloadState()
+                            }
+                            // Invalidating menu, because we need to hide menu items for empty payloads
+                            requireActivity().invalidateOptionsMenu()
+
+                            payloadBinding.loadingProgress.visibility = View.GONE
+                        }
                     }
-                    // Invalidating menu, because we need to hide menu items for empty payloads
-                    requireActivity().invalidateOptionsMenu()
-
-                    payloadBinding.loadingProgress.visibility = View.GONE
-                }
-            },
-        )
+            }
+        }
         payloadBinding.searchNavButton.setOnClickListener {
             onSearchScrollerButtonClick(true)
         }
@@ -310,10 +314,11 @@ internal class TransactionPayloadFragment :
         }
 
         if (payloadType == PayloadType.REQUEST) {
-            viewModel.doesRequestBodyRequireEncoding.observe(
-                viewLifecycleOwner,
-                { menu.findItem(R.id.encode_url).isVisible = it },
-            )
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModel.doesRequestBodyRequireEncoding.collect { menu.findItem(R.id.encode_url).isVisible = it }
+                }
+            }
         } else {
             menu.findItem(R.id.encode_url).isVisible = false
         }

@@ -10,7 +10,9 @@ plugins {
 kotlin {
     compilerOptions {
         freeCompilerArgs.addAll(
-            "-module-name", "com.github.ChuckerTeam.Chucker.library", "-Xexplicit-api=strict",
+            "-module-name",
+            "com.github.ChuckerTeam.Chucker.library",
+            "-Xexplicit-api=strict",
         )
     }
     androidTarget {
@@ -115,6 +117,7 @@ dependencies {
     add("androidUnitTestImplementation", libs.truth)
     add("androidUnitTestImplementation", libs.robolectric)
     add("androidUnitTestImplementation", libs.kotlinx.coroutines.test)
+    add("androidUnitTestImplementation", libs.kotlinx.coroutines.turbine)
     add("androidInstrumentedTestImplementation", libs.junit4)
     add("androidInstrumentedTestImplementation", libs.androidx.test.runner)
     add("androidInstrumentedTestImplementation", libs.androidx.test.rules)

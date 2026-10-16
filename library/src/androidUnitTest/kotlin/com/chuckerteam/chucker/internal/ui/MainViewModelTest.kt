@@ -3,7 +3,7 @@ package com.chuckerteam.chucker.internal.ui
 import android.text.TextUtils
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
+import app.cash.turbine.test
 import com.chuckerteam.chucker.internal.data.entity.HttpTransaction
 import com.chuckerteam.chucker.internal.data.entity.HttpTransactionTuple
 import com.chuckerteam.chucker.internal.data.repository.HttpTransactionRepository
@@ -43,9 +43,6 @@ internal class MainViewModelTest {
     @MockK
     private lateinit var transactionRepository: HttpTransactionRepository
 
-    @MockK
-    private lateinit var transactionObserver: Observer<List<HttpTransactionTuple>>
-
     private lateinit var viewModel: MainViewModel
 
     private val emptyTransactionList = MutableLiveData<List<HttpTransactionTuple>>()
@@ -55,8 +52,6 @@ internal class MainViewModelTest {
         MockKAnnotations.init(this)
         Dispatchers.setMain(testDispatcher)
         mockkStatic(TextUtils::class)
-
-        every { transactionObserver.onChanged(any()) } just runs
 
         every { transactionRepository.getSortedTransactionTuples() } returns emptyTransactionList
         every {
@@ -73,14 +68,12 @@ internal class MainViewModelTest {
         every { NotificationHelper.clearBuffer() } just runs
 
         viewModel = MainViewModel()
-        viewModel.isItemSelected.observeForever {}
     }
 
     @After
     fun tearDown() {
         Dispatchers.resetMain()
         unmockkAll()
-        viewModel.isItemSelected.removeObserver {}
     }
 
     @Test
@@ -91,12 +84,13 @@ internal class MainViewModelTest {
             every { transactionRepository.getSortedTransactionTuples() } returns transactionLiveData
             every { TextUtils.isDigitsOnly(any()) } returns false
 
-            viewModel.transactions.observeForever(transactionObserver)
-            viewModel.updateItemsFilter("")
-            transactionLiveData.value = expectedTuples
-
-            verify { transactionRepository.getSortedTransactionTuples() }
-            verify { transactionObserver.onChanged(expectedTuples) }
+            viewModel.transactions.test {
+                viewModel.updateItemsFilter("")
+                testDispatcher.scheduler.runCurrent()
+                transactionLiveData.value = expectedTuples
+                assertEquals(expectedTuples, awaitItem())
+                verify { transactionRepository.getSortedTransactionTuples() }
+            }
         }
 
     @Test
@@ -113,12 +107,13 @@ internal class MainViewModelTest {
             } returns transactionLiveData
             every { TextUtils.isDigitsOnly(searchQuery) } returns true
 
-            viewModel.transactions.observeForever(transactionObserver)
-            viewModel.updateItemsFilter(searchQuery)
-            transactionLiveData.value = expectedTuples
-
-            verify { transactionRepository.getFilteredTransactionTuples(searchQuery, "") }
-            verify { transactionObserver.onChanged(expectedTuples) }
+            viewModel.transactions.test {
+                viewModel.updateItemsFilter(searchQuery)
+                testDispatcher.scheduler.runCurrent()
+                transactionLiveData.value = expectedTuples
+                assertEquals(expectedTuples, awaitItem())
+                verify { transactionRepository.getFilteredTransactionTuples(searchQuery, "") }
+            }
         }
 
     @Test
@@ -135,12 +130,13 @@ internal class MainViewModelTest {
             } returns transactionLiveData
             every { TextUtils.isDigitsOnly(searchQuery) } returns false
 
-            viewModel.transactions.observeForever(transactionObserver)
-            viewModel.updateItemsFilter(searchQuery)
-            transactionLiveData.value = expectedTuples
-
-            verify { transactionRepository.getFilteredTransactionTuples("", searchQuery) }
-            verify { transactionObserver.onChanged(expectedTuples) }
+            viewModel.transactions.test {
+                viewModel.updateItemsFilter(searchQuery)
+                testDispatcher.scheduler.runCurrent()
+                transactionLiveData.value = expectedTuples
+                assertEquals(expectedTuples, awaitItem())
+                verify { transactionRepository.getFilteredTransactionTuples("", searchQuery) }
+            }
         }
 
     @Test

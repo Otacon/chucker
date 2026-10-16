@@ -17,7 +17,7 @@ internal const val SEGMENT_SIZE = 8_192L
 
 internal fun getResourceFile(file: String): Buffer =
     Buffer().apply {
-        writeAll(File("./src/test/resources/$file").source().buffer())
+        writeAll(File("./src/androidUnitTest/resources/$file").source().buffer())
     }
 
 internal fun Response.readByteStringBody(length: Long? = null): ByteString? =
