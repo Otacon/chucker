@@ -2,7 +2,6 @@ package com.chuckerteam.chucker.internal.ui.transaction
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.chuckerteam.chucker.internal.data.repository.RepositoryProvider
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,14 +22,12 @@ internal class TransactionViewModel(
         RepositoryProvider
             .transaction()
             .getTransaction(transactionId)
-            .asFlow()
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+            .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     val transactionTitle =
         RepositoryProvider
             .transaction()
             .getTransaction(transactionId)
-            .asFlow()
             .combine(encodeUrl) { transaction, encodeUrl ->
                 if (transaction != null) {
                     "${transaction.method} ${transaction.getFormattedPath(encode = encodeUrl)}"
@@ -43,7 +40,6 @@ internal class TransactionViewModel(
         RepositoryProvider
             .transaction()
             .getTransaction(transactionId)
-            .asFlow()
             .map { transaction ->
                 if (transaction == null) {
                     false
@@ -56,7 +52,6 @@ internal class TransactionViewModel(
         RepositoryProvider
             .transaction()
             .getTransaction(transactionId)
-            .asFlow()
             .map { transaction ->
                 transaction?.requestContentType?.contains("x-www-form-urlencoded", ignoreCase = true) ?: false
             }

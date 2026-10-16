@@ -2,7 +2,6 @@ package com.chuckerteam.chucker.internal.ui
 
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.chuckerteam.chucker.internal.data.entity.HttpTransaction
 import com.chuckerteam.chucker.internal.data.repository.RepositoryProvider
@@ -38,7 +37,7 @@ internal class MainViewModel : ViewModel() {
                     searchQuery.isDigitsOnly() -> getFilteredTransactionTuples(searchQuery, "")
                     else -> getFilteredTransactionTuples("", searchQuery)
                 }
-            }.asFlow()
+            }
         }
 
     /**

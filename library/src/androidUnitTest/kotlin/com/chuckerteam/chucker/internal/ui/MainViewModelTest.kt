@@ -1,8 +1,6 @@
 package com.chuckerteam.chucker.internal.ui
 
 import android.text.TextUtils
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.MutableLiveData
 import app.cash.turbine.test
 import com.chuckerteam.chucker.internal.data.entity.HttpTransaction
 import com.chuckerteam.chucker.internal.data.entity.HttpTransactionTuple
@@ -22,6 +20,7 @@ import io.mockk.runs
 import io.mockk.unmockkAll
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -29,15 +28,11 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.assertEquals
 
 @ExperimentalCoroutinesApi
 internal class MainViewModelTest {
-    @get:Rule
-    val instantExecutorRule = InstantTaskExecutorRule()
-
     private val testDispatcher = StandardTestDispatcher()
 
     @MockK
@@ -45,7 +40,7 @@ internal class MainViewModelTest {
 
     private lateinit var viewModel: MainViewModel
 
-    private val emptyTransactionList = MutableLiveData<List<HttpTransactionTuple>>()
+    private val emptyTransactionList = MutableSharedFlow<List<HttpTransactionTuple>>(replay = 1)
 
     @Before
     fun setup() {
@@ -80,14 +75,13 @@ internal class MainViewModelTest {
     fun `when search query is empty, getSortedTransactionTuples is called`() =
         runTest {
             val expectedTuples = listOf(mockk<HttpTransactionTuple>(relaxed = true))
-            val transactionLiveData = MutableLiveData<List<HttpTransactionTuple>>()
-            every { transactionRepository.getSortedTransactionTuples() } returns transactionLiveData
+            val transactionFlow = MutableSharedFlow<List<HttpTransactionTuple>>(replay = 1)
+            every { transactionRepository.getSortedTransactionTuples() } returns transactionFlow
             every { TextUtils.isDigitsOnly(any()) } returns false
 
             viewModel.transactions.test {
                 viewModel.updateItemsFilter("")
-                testDispatcher.scheduler.runCurrent()
-                transactionLiveData.value = expectedTuples
+                transactionFlow.emit(expectedTuples)
                 assertEquals(expectedTuples, awaitItem())
                 verify { transactionRepository.getSortedTransactionTuples() }
             }
@@ -98,19 +92,18 @@ internal class MainViewModelTest {
         runTest {
             val searchQuery = "123"
             val expectedTuples = listOf(mockk<HttpTransactionTuple>(relaxed = true))
-            val transactionLiveData = MutableLiveData<List<HttpTransactionTuple>>()
+            val transactionFlow = MutableSharedFlow<List<HttpTransactionTuple>>(replay = 1)
             every {
                 transactionRepository.getFilteredTransactionTuples(
                     searchQuery,
                     "",
                 )
-            } returns transactionLiveData
+            } returns transactionFlow
             every { TextUtils.isDigitsOnly(searchQuery) } returns true
 
             viewModel.transactions.test {
                 viewModel.updateItemsFilter(searchQuery)
-                testDispatcher.scheduler.runCurrent()
-                transactionLiveData.value = expectedTuples
+                transactionFlow.emit(expectedTuples)
                 assertEquals(expectedTuples, awaitItem())
                 verify { transactionRepository.getFilteredTransactionTuples(searchQuery, "") }
             }
@@ -121,19 +114,18 @@ internal class MainViewModelTest {
         runTest {
             val searchQuery = "test"
             val expectedTuples = listOf(mockk<HttpTransactionTuple>(relaxed = true))
-            val transactionLiveData = MutableLiveData<List<HttpTransactionTuple>>()
+            val transactionFlow = MutableSharedFlow<List<HttpTransactionTuple>>(replay = 1)
             every {
                 transactionRepository.getFilteredTransactionTuples(
                     "",
                     searchQuery,
                 )
-            } returns transactionLiveData
+            } returns transactionFlow
             every { TextUtils.isDigitsOnly(searchQuery) } returns false
 
             viewModel.transactions.test {
                 viewModel.updateItemsFilter(searchQuery)
-                testDispatcher.scheduler.runCurrent()
-                transactionLiveData.value = expectedTuples
+                transactionFlow.emit(expectedTuples)
                 assertEquals(expectedTuples, awaitItem())
                 verify { transactionRepository.getFilteredTransactionTuples("", searchQuery) }
             }

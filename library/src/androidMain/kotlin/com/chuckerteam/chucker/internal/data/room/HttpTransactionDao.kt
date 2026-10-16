@@ -1,6 +1,5 @@
 package com.chuckerteam.chucker.internal.data.room
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -8,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Update
 import com.chuckerteam.chucker.internal.data.entity.HttpTransaction
 import com.chuckerteam.chucker.internal.data.entity.HttpTransactionTuple
+import kotlinx.coroutines.flow.Flow
 
 @Suppress("TooManyFunctions")
 @Dao
@@ -17,7 +17,7 @@ internal interface HttpTransactionDao {
             "requestPayloadSize, responsePayloadSize, error, graphQLDetected, graphQlOperationName FROM " +
             "transactions ORDER BY requestDate DESC",
     )
-    fun getSortedTuples(): LiveData<List<HttpTransactionTuple>>
+    fun getSortedTuples(): Flow<List<HttpTransactionTuple>>
 
     @Query(
         "SELECT id, requestDate, tookMs, protocol, method, host, path, scheme, responseCode, " +
@@ -29,7 +29,7 @@ internal interface HttpTransactionDao {
         codeQuery: String,
         pathQuery: String,
         graphQlQuery: String = "",
-    ): LiveData<List<HttpTransactionTuple>>
+    ): Flow<List<HttpTransactionTuple>>
 
     @Insert
     suspend fun insert(transaction: HttpTransaction): Long?
@@ -41,7 +41,7 @@ internal interface HttpTransactionDao {
     suspend fun deleteAll(): Int
 
     @Query("SELECT * FROM transactions WHERE id = :id")
-    fun getById(id: Long): LiveData<HttpTransaction?>
+    fun getById(id: Long): Flow<HttpTransaction?>
 
     @Query("DELETE FROM transactions WHERE requestDate <= :threshold")
     suspend fun deleteBefore(threshold: Long): Int

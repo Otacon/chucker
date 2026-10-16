@@ -1,8 +1,6 @@
 package com.chuckerteam.chucker.internal.ui.transaction
 
-import androidx.lifecycle.MutableLiveData
 import app.cash.turbine.test
-import com.chuckerteam.chucker.internal.InstantExecutorExtension
 import com.chuckerteam.chucker.internal.data.entity.HttpTransaction
 import com.chuckerteam.chucker.internal.data.repository.HttpTransactionRepository
 import com.chuckerteam.chucker.internal.data.repository.RepositoryProvider
@@ -17,6 +15,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.setMain
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -24,17 +23,15 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 
 @ExperimentalCoroutinesApi
-@ExtendWith(InstantExecutorExtension::class)
 internal class TransactionViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
 
     @MockK
     private lateinit var transactionRepository: HttpTransactionRepository
 
-    private val transaction = MutableLiveData<HttpTransaction?>()
+    private val transaction = MutableSharedFlow<HttpTransaction?>(replay = 1)
 
     private lateinit var viewModel: TransactionViewModel
 
@@ -86,7 +83,7 @@ internal class TransactionViewModelTest {
                 val txn = mockk<HttpTransaction>()
                 every { txn.method } returns "POST"
                 every { txn.getFormattedPath(encode = false) } returns "/foo?bar=1"
-                transaction.value = txn
+                transaction.emit(txn)
                 assertEquals("POST /foo?bar=1", awaitItem())
             }
         }
@@ -98,8 +95,10 @@ internal class TransactionViewModelTest {
             viewModel.transactionTitle.test {
                 val txn = mockk<HttpTransaction>()
                 every { txn.method } returns "GET"
+                every { txn.getFormattedPath(encode = false) } returns "/baz"
                 every { txn.getFormattedPath(encode = true) } returns "/baz%20encoded"
-                transaction.value = txn
+                transaction.emit(txn)
+                assertEquals("GET /baz", awaitItem())
                 viewModel.encodeUrl(true)
                 assertEquals("GET /baz%20encoded", awaitItem())
             }
@@ -113,7 +112,7 @@ internal class TransactionViewModelTest {
                 val txn = mockk<HttpTransaction>()
                 every { txn.getFormattedPath(true) } returns "/same"
                 every { txn.getFormattedPath(false) } returns "/same"
-                transaction.value = txn
+                transaction.emit(txn)
                 assertFalse(awaitItem())
             }
         }
@@ -126,7 +125,7 @@ internal class TransactionViewModelTest {
                 val txn = mockk<HttpTransaction>()
                 every { txn.getFormattedPath(true) } returns "/enc"
                 every { txn.getFormattedPath(false) } returns "/raw"
-                transaction.value = txn
+                transaction.emit(txn)
                 assertTrue(awaitItem())
             }
         }
@@ -136,9 +135,9 @@ internal class TransactionViewModelTest {
     fun `doesRequestBodyRequireEncoding handles null and non‐form content`() {
         runTest {
             viewModel.doesRequestBodyRequireEncoding.test {
-                transaction.value = mockk { every { requestContentType } returns null }
+                transaction.emit(mockk { every { requestContentType } returns null })
                 assertFalse(awaitItem())
-                transaction.value = mockk { every { requestContentType } returns "application/json" }
+                transaction.emit(mockk { every { requestContentType } returns "application/json" })
                 assertFalse(awaitItem())
             }
         }
@@ -148,7 +147,7 @@ internal class TransactionViewModelTest {
     fun `doesRequestBodyRequireEncoding true for form-urlencoded`() {
         runTest {
             viewModel.doesRequestBodyRequireEncoding.test {
-                transaction.value = mockk { every { requestContentType } returns "application/x-www-form-urlencoded; charset=UTF-8" }
+                transaction.emit(mockk { every { requestContentType } returns "application/x-www-form-urlencoded; charset=UTF-8" })
                 assertTrue(awaitItem())
             }
         }
@@ -159,7 +158,7 @@ internal class TransactionViewModelTest {
         runTest {
             viewModel.formatRequestBody.test {
                 viewModel.encodeUrl(false)
-                transaction.value = mockk { every { requestContentType } returns null }
+                transaction.emit(mockk { every { requestContentType } returns null })
                 assertTrue(awaitItem())
             }
         }
@@ -170,7 +169,7 @@ internal class TransactionViewModelTest {
         runTest {
             viewModel.formatRequestBody.test {
                 viewModel.encodeUrl(true)
-                transaction.value = mockk { every { requestContentType } returns null }
+                transaction.emit(mockk { every { requestContentType } returns null })
                 assertTrue(awaitItem())
             }
         }
@@ -181,7 +180,7 @@ internal class TransactionViewModelTest {
         runTest {
             viewModel.formatRequestBody.test {
                 viewModel.encodeUrl(false)
-                transaction.value = mockk { every { requestContentType } returns "x-www-form-urlencoded" }
+                transaction.emit(mockk { every { requestContentType } returns "x-www-form-urlencoded" })
                 assertTrue(awaitItem())
             }
         }
@@ -192,7 +191,7 @@ internal class TransactionViewModelTest {
         runTest {
             viewModel.formatRequestBody.test {
                 viewModel.encodeUrl(true)
-                transaction.value = mockk { every { requestContentType } returns "x-www-form-urlencoded" }
+                transaction.emit(mockk { every { requestContentType } returns "x-www-form-urlencoded" })
                 assertFalse(awaitItem())
             }
         }
@@ -202,7 +201,7 @@ internal class TransactionViewModelTest {
     fun `transaction exposes repository data as a flow`() {
         runTest {
             viewModel.transaction.test {
-                transaction.value = null
+                transaction.emit(null)
                 assertEquals(null, awaitItem())
             }
         }

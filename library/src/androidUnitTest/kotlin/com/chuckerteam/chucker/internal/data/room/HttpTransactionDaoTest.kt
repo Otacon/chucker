@@ -2,7 +2,6 @@ package com.chuckerteam.chucker.internal.data.room
 
 import android.content.Context
 import android.database.Cursor
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.chuckerteam.chucker.internal.data.entity.HttpTransaction
@@ -12,19 +11,15 @@ import com.chuckerteam.chucker.internal.data.entity.createRequest
 import com.chuckerteam.chucker.internal.data.entity.withResponseData
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.first
 import org.junit.After
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 internal class HttpTransactionDaoTest {
-    @Rule
-    @JvmField
-    val instantExecutorRule = InstantTaskExecutorRule()
-
     private lateinit var db: ChuckerDatabase
     private lateinit var testObject: HttpTransactionDao
 
@@ -85,9 +80,7 @@ internal class HttpTransactionDaoTest {
             val transaction = createRequest().withResponseData()
             insertTransaction(transaction)
 
-            testObject.getById(transaction.id).observeForever {
-                assertTransaction(transaction.id, transaction, it)
-            }
+            assertTransaction(transaction.id, transaction, testObject.getById(transaction.id).first())
         }
 
     @Test
@@ -121,9 +114,7 @@ internal class HttpTransactionDaoTest {
             val rowsUpdated = testObject.update(newer)
             assertThat(rowsUpdated).isEqualTo(1)
 
-            testObject.getById(older.id).observeForever {
-                assertTransaction(older.id, newer, it)
-            }
+            assertTransaction(older.id, newer, testObject.getById(older.id).first())
         }
 
     @Test
@@ -176,9 +167,7 @@ internal class HttpTransactionDaoTest {
             insertTransaction(older)
             insertTransaction(newer)
 
-            testObject.getSortedTuples().observeForever { result ->
-                assertTuples(listOf(newer, older), result)
-            }
+            assertTuples(listOf(newer, older), testObject.getSortedTuples().first())
         }
 
     @Test
@@ -201,9 +190,10 @@ internal class HttpTransactionDaoTest {
             insertTransaction(transactionTwo)
             insertTransaction(transactionThree)
 
-            testObject.getFilteredTuples(codeQuery = "418", pathQuery = "%abc%").observeForever { result ->
-                assertTuples(listOf(transactionOne, transactionTwo), result)
-            }
+            assertTuples(
+                listOf(transactionOne, transactionTwo),
+                testObject.getFilteredTuples(codeQuery = "418", pathQuery = "%abc%").first(),
+            )
         }
 
     @Test
@@ -234,11 +224,10 @@ internal class HttpTransactionDaoTest {
             insertTransaction(transactionThree)
             insertTransaction(transactionFour)
 
-            testObject
-                .getFilteredTuples(codeQuery = "%", pathQuery = "%get%", graphQlQuery = "%get%")
-                .observeForever { result ->
-                    assertTuples(listOf(transactionFour), result)
-                }
+            assertTuples(
+                listOf(transactionFour),
+                testObject.getFilteredTuples(codeQuery = "%", pathQuery = "%get%", graphQlQuery = "%get%").first(),
+            )
         }
 
     @Test
@@ -264,9 +253,10 @@ internal class HttpTransactionDaoTest {
             insertTransaction(transactionTwo)
             insertTransaction(transactionThree)
 
-            testObject.getFilteredTuples(codeQuery = "4%", pathQuery = "%").observeForever { result ->
-                assertTuples(listOf(transactionThree, transactionOne), result)
-            }
+            assertTuples(
+                listOf(transactionThree, transactionOne),
+                testObject.getFilteredTuples(codeQuery = "4%", pathQuery = "%").first(),
+            )
         }
 
     private suspend fun insertTransaction(transaction: HttpTransaction) {
