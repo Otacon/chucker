@@ -4,7 +4,6 @@ import com.google.common.truth.Truth.assertThat
 import okio.Buffer
 import okio.ByteString.Companion.encodeUtf8
 import org.junit.jupiter.api.Test
-import java.nio.charset.Charset
 
 internal class OkioUtilsTest {
     @Test
@@ -17,7 +16,7 @@ internal class OkioUtilsTest {
     @Test
     fun `blank content is probably plain text`() {
         val buffer = Buffer()
-        buffer.writeString(" ", Charset.defaultCharset())
+        buffer.writeUtf8(" ")
 
         assertThat(buffer.isProbablyPlainText).isTrue()
     }
@@ -25,7 +24,7 @@ internal class OkioUtilsTest {
     @Test
     fun `plain text content is probably plain text`() {
         val buffer = Buffer()
-        buffer.writeString("just a string", Charset.defaultCharset())
+        buffer.writeUtf8("just a string")
 
         assertThat(buffer.isProbablyPlainText).isTrue()
     }
@@ -41,7 +40,7 @@ internal class OkioUtilsTest {
     @Test
     fun `non-ASCII content is probably plain text`() {
         val buffer = Buffer()
-        buffer.writeString("ą", Charset.defaultCharset())
+        buffer.writeUtf8("ą")
 
         assertThat(buffer.isProbablyPlainText).isTrue()
     }

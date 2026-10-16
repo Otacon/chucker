@@ -2,7 +2,7 @@ package com.chuckerteam.chucker.internal.support
 
 import okio.Buffer
 import okio.ByteString
-import java.io.EOFException
+import okio.EOFException
 import kotlin.math.min
 
 private const val MAX_PREFIX_SIZE = 64L
@@ -31,4 +31,11 @@ internal val ByteString.isProbablyPlainText: Boolean
         return Buffer().write(this, offset = 0, byteCount).isProbablyPlainText
     }
 
-private fun Int.isPlainTextChar() = Character.isWhitespace(this) || !Character.isISOControl(this)
+private fun Int.isPlainTextChar(): Boolean =
+    if (this > Char.MAX_VALUE.code) {
+        true
+    } else {
+        toChar().isWhitespace() || !isControlCodePoint()
+    }
+
+private fun Int.isControlCodePoint() = this in 0x00..0x1F || this in 0x7F..0x9F

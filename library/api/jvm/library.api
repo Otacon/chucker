@@ -1,0 +1,5 @@
+public abstract interface class com/chuckerteam/chucker/api/BodyDecoder {
+	public abstract fun decodeRequest (Lokhttp3/Request;Lokio/ByteString;)Ljava/lang/String;
+	public abstract fun decodeResponse (Lokhttp3/Response;Lokio/ByteString;)Ljava/lang/String;
+}
+

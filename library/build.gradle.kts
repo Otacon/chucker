@@ -30,8 +30,8 @@ kotlin {
             dependencies {
                 implementation(libs.androidx.room.runtime)
                 implementation(libs.kotlinx.serialization.json)
-                implementation(libs.okhttp)
-                implementation(libs.okhttp3.okhttp)
+                implementation(libs.dec)
+                api(libs.okhttp)
             }
         }
         androidMain.get().dependsOn(androidJvmMain)
@@ -43,6 +43,7 @@ kotlin {
                 implementation(libs.junit)
                 implementation(libs.junit4)
                 implementation(libs.junit.jupiter.params)
+                implementation(libs.mockk)
                 implementation(libs.truth)
                 runtimeOnly(libs.junit.engine)
                 runtimeOnly(libs.junit.vintage.engine)
@@ -132,7 +133,6 @@ dependencies {
 
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.json)
-    implementation(libs.dec)
 
     api(libs.okhttp)
     api(libs.okhttp3.okhttp)
