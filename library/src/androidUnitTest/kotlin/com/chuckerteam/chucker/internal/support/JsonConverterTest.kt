@@ -2,6 +2,7 @@ package com.chuckerteam.chucker.internal.support
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.jupiter.api.Test
+import kotlinx.serialization.Serializable
 
 internal class JsonConverterTest {
     @Test
@@ -14,7 +15,7 @@ internal class JsonConverterTest {
 
     @Test
     fun `JSON object has null values serialized`() {
-        val json = JsonConverter.instance.toJson(NullTestClass(null))
+        val json = JsonConverter.toJson(NullTestClass(null))
         assertThat(json).isEqualTo(
             """
             {
@@ -24,7 +25,8 @@ internal class JsonConverterTest {
         )
     }
 
-    inner class NullTestClass(
+    @Serializable
+    data class NullTestClass(
         var string: String?,
     )
 }

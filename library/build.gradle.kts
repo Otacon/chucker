@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
 }
 
@@ -96,7 +97,7 @@ dependencies {
     add("kspAndroid", libs.androidx.room.compiler)
 
     implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.gson)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.dec)
 
     api(libs.okhttp)

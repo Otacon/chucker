@@ -30,7 +30,7 @@ internal class TransactionCurlCommandSharableTest {
     @Test
     fun `create cURL command with headers`() {
         val headers = List(5) { index -> HttpHeader("name$index", "value$index") }
-        val convertedHeaders = JsonConverter.instance.toJson(headers)
+        val convertedHeaders = JsonConverter.toJson(headers)
 
         requestMethods.forEach { method ->
             val transaction =
@@ -60,7 +60,7 @@ internal class TransactionCurlCommandSharableTest {
                 HttpHeader("X-JSON-Object", "{\"name\": \"value\"}"),
                 HttpHeader("Etag", "W/\"0815\""),
             )
-        val convertedHeaders = JsonConverter.instance.toJson(headers)
+        val convertedHeaders = JsonConverter.toJson(headers)
 
         requestMethods.forEach { method ->
             val transaction =
@@ -120,7 +120,7 @@ internal class TransactionCurlCommandSharableTest {
     @Test
     fun `create cURL command with shell special characters in header value`() {
         val headers = listOf(HttpHeader("X-Note", """It's "café" ${'$'}HOME `id` C:\tmp"""))
-        val convertedHeaders = JsonConverter.instance.toJson(headers)
+        val convertedHeaders = JsonConverter.toJson(headers)
 
         requestMethods.forEach { method ->
             val transaction =
@@ -140,7 +140,7 @@ internal class TransactionCurlCommandSharableTest {
     @Test
     fun `create cURL command with gzip header`() {
         val headers = listOf(HttpHeader("Accept-Encoding", "gzip"))
-        val convertedHeader = JsonConverter.instance.toJson(headers)
+        val convertedHeader = JsonConverter.toJson(headers)
 
         requestMethods.forEach { method ->
             val transaction =
@@ -161,7 +161,7 @@ internal class TransactionCurlCommandSharableTest {
     @Test
     fun `create cURL command with brotli header`() {
         val headers = listOf(HttpHeader("Accept-Encoding", "br"))
-        val convertedHeader = JsonConverter.instance.toJson(headers)
+        val convertedHeader = JsonConverter.toJson(headers)
 
         requestMethods.forEach { method ->
             val transaction =

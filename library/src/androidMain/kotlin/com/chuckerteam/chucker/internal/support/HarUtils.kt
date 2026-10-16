@@ -15,8 +15,9 @@ internal object HarUtils {
         version: String,
     ): String =
         withContext(Dispatchers.Default) {
-            JsonConverter.nonNullSerializerInstance
-                .toJson(fromHttpTransactions(transactions, Creator(name, version)))
+            JsonConverter.nonNullSerializerInstance.encodeToString(
+                fromHttpTransactions(transactions, Creator(name, version)),
+            )
         }
 
     internal fun fromHttpTransactions(
