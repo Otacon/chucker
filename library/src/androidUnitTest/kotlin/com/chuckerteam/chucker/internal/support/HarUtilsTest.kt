@@ -5,8 +5,8 @@ import androidx.test.core.app.ApplicationProvider
 import com.chuckerteam.chucker.R
 import com.chuckerteam.chucker.internal.data.har.log.Entry
 import com.chuckerteam.chucker.util.HarTestUtils
-import com.chuckerteam.chucker.util.HarTestUtils.createHarString
-import com.chuckerteam.chucker.util.HarTestUtils.createListTransactionHar
+import com.chuckerteam.chucker.util.createHarString
+import com.chuckerteam.chucker.util.createListTransactionHar
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.Before

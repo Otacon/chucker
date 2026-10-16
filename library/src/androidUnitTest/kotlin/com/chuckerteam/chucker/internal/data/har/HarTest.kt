@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.chuckerteam.chucker.R
 import com.chuckerteam.chucker.internal.data.har.log.Creator
-import com.chuckerteam.chucker.util.HarTestUtils.createSingleTransactionHar
+import com.chuckerteam.chucker.util.createSingleTransactionHar
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Test

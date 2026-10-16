@@ -30,7 +30,7 @@ internal interface HttpTransactionRepository {
 
     suspend fun getAllTransactions(): List<HttpTransaction>
 
-    fun getTransactionsInTimeRange(minTimestamp: Long?): List<HttpTransaction>
+    suspend fun getTransactionsInTimeRange(minTimestamp: Long?): List<HttpTransaction>
 
     /**
      * Deletes all transactions that match the given list of transaction IDs.

@@ -1,17 +1,12 @@
 package com.chuckerteam.chucker.util
 
-import android.content.Context
-import com.chuckerteam.chucker.R
 import com.chuckerteam.chucker.internal.data.entity.HttpTransaction
-import com.chuckerteam.chucker.internal.data.har.Har
 import com.chuckerteam.chucker.internal.data.har.log.Creator
 import com.chuckerteam.chucker.internal.data.har.log.Entry
 import com.chuckerteam.chucker.internal.data.har.log.entry.Request
 import com.chuckerteam.chucker.internal.data.har.log.entry.Response
 import com.chuckerteam.chucker.internal.data.har.log.entry.request.PostData
 import com.chuckerteam.chucker.internal.data.har.log.entry.response.Content
-import com.chuckerteam.chucker.internal.support.HarUtils
-import kotlinx.coroutines.runBlocking
 import java.util.Date
 
 internal object HarTestUtils {
@@ -55,27 +50,6 @@ internal object HarTestUtils {
             graphQlDetected = false,
         )
     }
-
-    internal fun Context.createSingleTransactionHar(method: String): Har =
-        HarUtils.fromHttpTransactions(
-            listOf(createTransaction(method)),
-            Creator(getString(R.string.chucker_name), getString(R.string.chucker_version)),
-        )
-
-    internal fun Context.createListTransactionHar(): Har =
-        HarUtils.fromHttpTransactions(
-            listOf(createTransaction("GET"), createTransaction("POST")),
-            Creator(getString(R.string.chucker_name), getString(R.string.chucker_version)),
-        )
-
-    internal fun Context.createHarString(): String =
-        runBlocking {
-            HarUtils.harStringFromTransactions(
-                listOf(createTransaction("POST")),
-                getString(R.string.chucker_name),
-                getString(R.string.chucker_version),
-            )
-        }
 
     internal fun createContent(method: String): Content = Content(createTransaction(method))
 

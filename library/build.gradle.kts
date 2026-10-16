@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.gradle.api.tasks.testing.Test
 
 plugins {
     alias(libs.plugins.android.library)
@@ -22,6 +23,39 @@ kotlin {
         compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
     }
     jvmToolchain(21)
+
+    sourceSets {
+        val androidJvmMain = create("androidJvmMain") {
+            dependsOn(commonMain.get())
+            dependencies {
+                implementation(libs.androidx.room.runtime)
+                implementation(libs.kotlinx.serialization.json)
+                implementation(libs.okhttp)
+                implementation(libs.okhttp3.okhttp)
+            }
+        }
+        androidMain.get().dependsOn(androidJvmMain)
+        jvmMain.get().dependsOn(androidJvmMain)
+
+        val androidJvmTest = create("androidJvmTest") {
+            dependsOn(commonTest.get())
+            dependencies {
+                implementation(libs.junit)
+                implementation(libs.junit4)
+                implementation(libs.junit.jupiter.params)
+                implementation(libs.truth)
+                runtimeOnly(libs.junit.engine)
+                runtimeOnly(libs.junit.vintage.engine)
+                runtimeOnly(libs.junit.platform.launcher)
+            }
+        }
+        androidUnitTest.get().dependsOn(androidJvmTest)
+        jvmTest.get().dependsOn(androidJvmTest)
+    }
+}
+
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
 }
 
 android {
@@ -93,9 +127,8 @@ dependencies {
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.room.ktx)
-    implementation(libs.androidx.room.runtime)
     add("kspAndroid", libs.androidx.room.compiler)
+    add("kspJvm", libs.androidx.room.compiler)
 
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.json)
