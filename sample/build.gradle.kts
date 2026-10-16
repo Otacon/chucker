@@ -1,9 +1,16 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.wire)
     alias(libs.plugins.apollo)
     alias(libs.plugins.compose.compiler)
+}
+
+kotlin {
+    androidTarget {
+        compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+    }
+    jvmToolchain(21)
 }
 
 wire {
@@ -70,8 +77,8 @@ android {
 apollo {
     service("rickandmortyapi") {
         packageName.set("com.chuckerteam.chucker.sample")
-        schemaFile.set(file("src/main/graphql/com/chuckerteam/chucker/sample/schema.json.graphql"))
-        srcDir(file("src/main/graphql"))
+        schemaFile.set(file("src/androidMain/graphql/com/chuckerteam/chucker/sample/schema.json.graphql"))
+        srcDir(file("src/androidMain/graphql"))
         excludes.set(listOf("**/schema.json.graphql", "**/schema.json"))
         generateKotlinModels.set(true)
     }

@@ -1,10 +1,23 @@
-import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.multiplatform)
+}
+
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.addAll(
+            "-module-name", "com.github.ChuckerTeam.Chucker.library", "-Xexplicit-api=strict",
+        )
+    }
+    androidTarget {
+        compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
+    }
+    jvm {
+        compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
+    }
+    jvmToolchain(21)
 }
 
 android {
@@ -18,9 +31,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlin {
-        jvmToolchain(21)
-    }
 
     buildFeatures {
         buildConfig = false
@@ -40,17 +50,6 @@ android {
         abortOnError = true
         disable.addAll(listOf("RtlEnabled", "GradleDependency"))
         warningsAsErrors = true
-    }
-}
-
-tasks.withType<KotlinCompile>().configureEach {
-    compilerOptions {
-        jvmTarget = JvmTarget.JVM_17
-        freeCompilerArgs.addAll(
-            "-module-name",
-            "com.github.ChuckerTeam.Chucker.library",
-            "-Xexplicit-api=strict",
-        )
     }
 }
 

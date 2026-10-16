@@ -1,10 +1,24 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.ksp)
+}
+
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.addAll(
+            "-module-name", "com.github.ChuckerTeam.Chucker.library", "-Xexplicit-api=strict",
+        )
+    }
+    androidTarget {
+        compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
+    }
+    jvm {
+        compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
+    }
+    jvmToolchain(21)
 }
 
 android {
@@ -24,10 +38,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    kotlin {
-        jvmToolchain(21)
     }
 
     buildFeatures {
@@ -70,17 +80,6 @@ android {
     }
 }
 
-tasks.withType<KotlinCompile>().configureEach {
-    compilerOptions {
-        jvmTarget = JvmTarget.JVM_17
-        freeCompilerArgs.addAll(
-            "-module-name",
-            "com.github.ChuckerTeam.Chucker.library",
-            "-Xexplicit-api=strict",
-        )
-    }
-}
-
 dependencies {
     implementation(libs.jetbrains.kotlin.stdlib)
 
@@ -94,7 +93,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
-    ksp(libs.androidx.room.compiler)
+    add("kspAndroid", libs.androidx.room.compiler)
 
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.gson)
@@ -102,26 +101,24 @@ dependencies {
 
     api(libs.okhttp)
     api(libs.okhttp3.okhttp)
-    testImplementation(libs.mockwebserver)
-    testRuntimeOnly(libs.junit.engine)
-    testRuntimeOnly(libs.junit.platform.launcher)
-    testRuntimeOnly(libs.junit.vintage.engine)
-
-    testImplementation(libs.junit)
-    testImplementation(libs.junit4)
-    testImplementation(libs.junit.jupiter.params)
-    testImplementation(libs.mockk)
-    testImplementation(libs.androidx.core)
-    testImplementation(libs.androidx.core.testing)
-    testImplementation(libs.truth)
-    testImplementation(libs.robolectric)
-    testImplementation(libs.kotlinx.coroutines.test)
-
-    androidTestImplementation(libs.junit4)
-    androidTestImplementation(libs.androidx.test.runner)
-    androidTestImplementation(libs.androidx.test.rules)
-    androidTestImplementation(libs.truth)
-    androidTestImplementation(libs.androidx.junit)
+    add("androidUnitTestImplementation", libs.mockwebserver)
+    add("androidUnitTestRuntimeOnly", libs.junit.engine)
+    add("androidUnitTestRuntimeOnly", libs.junit.platform.launcher)
+    add("androidUnitTestRuntimeOnly", libs.junit.vintage.engine)
+    add("androidUnitTestImplementation", libs.junit)
+    add("androidUnitTestImplementation", libs.junit4)
+    add("androidUnitTestImplementation", libs.junit.jupiter.params)
+    add("androidUnitTestImplementation", libs.mockk)
+    add("androidUnitTestImplementation", libs.androidx.core)
+    add("androidUnitTestImplementation", libs.androidx.core.testing)
+    add("androidUnitTestImplementation", libs.truth)
+    add("androidUnitTestImplementation", libs.robolectric)
+    add("androidUnitTestImplementation", libs.kotlinx.coroutines.test)
+    add("androidInstrumentedTestImplementation", libs.junit4)
+    add("androidInstrumentedTestImplementation", libs.androidx.test.runner)
+    add("androidInstrumentedTestImplementation", libs.androidx.test.rules)
+    add("androidInstrumentedTestImplementation", libs.truth)
+    add("androidInstrumentedTestImplementation", libs.androidx.junit)
 }
 
 apply(from = rootProject.file("gradle/gradle-mvn-push.gradle"))
